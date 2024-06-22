@@ -1,0 +1,14 @@
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\bin\Debug\net8.0\WindowsTerminalHotkey.exe
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\bin\Debug\net8.0\WindowsTerminalHotkey.deps.json
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\bin\Debug\net8.0\WindowsTerminalHotkey.runtimeconfig.json
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\bin\Debug\net8.0\WindowsTerminalHotkey.dll
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\bin\Debug\net8.0\WindowsTerminalHotkey.pdb
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\WindowsTerminalHotkey.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\WindowsTerminalHotkey.AssemblyInfoInputs.cache
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\WindowsTerminalHotkey.AssemblyInfo.cs
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\WindowsTerminalHotkey.csproj.CoreCompileInputs.cache
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\WindowsTerminalHotkey.dll
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\refint\WindowsTerminalHotkey.dll
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\WindowsTerminalHotkey.pdb
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\WindowsTerminalHotkey.genruntimeconfig.cache
+C:\Users\Will Mortimer\Development\WindowsTerminalHotkey\obj\Debug\net8.0\ref\WindowsTerminalHotkey.dll
