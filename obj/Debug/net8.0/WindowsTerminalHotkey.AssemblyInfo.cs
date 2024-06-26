@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WindowsTerminalHotkey")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bb869277289217f8e109b9ab06ae06fcde4eb51")]
 [assembly: System.Reflection.AssemblyProductAttribute("WindowsTerminalHotkey")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WindowsTerminalHotkey")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
