@@ -2,14 +2,18 @@ using Spectre.Console.Cli;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 public class RunCommand : Command<RunCommand.Settings>
 {
+    private Config? _config;
+    private SystemTrayManager? _trayManager;
+
     public class Settings : CommandSettings
     {
         [Description("Path to the configuration file.")]
         [CommandOption("--configpath")]
-        public string ConfigPath { get; set; } = string.Empty;
+        public string? ConfigPath { get; set; }
 
         [Description("Run in silent mode.")]
         [CommandOption("--silent")]
@@ -18,10 +22,9 @@ public class RunCommand : Command<RunCommand.Settings>
 
     public override int Execute(CommandContext context, Settings settings)
     {
-        string configPath = string.IsNullOrEmpty(settings.ConfigPath) ? "config.json" : settings.ConfigPath;
-        Config config = ConfigManager.Load(configPath);
+        _config = ConfigManager.Load(settings.ConfigPath);
 
-        if (config.RunAtStartup)
+        if (_config.RunAtStartup)
         {
             StartupManager.AddToStartup("WindowsTerminalHotkey", System.Reflection.Assembly.GetExecutingAssembly().Location);
         }
@@ -30,77 +33,118 @@ public class RunCommand : Command<RunCommand.Settings>
             StartupManager.RemoveFromStartup("WindowsTerminalHotkey");
         }
 
-        if (settings.Silent || config.SilentMode)
+        if (settings.Silent || _config.SilentMode)
         {
-            RunHeadless(config);
+            RunHeadless();
         }
         else
         {
-            RunWithUI(config);
+            RunWithUI();
         }
 
         return 0;
     }
 
-    private void RunHeadless(Config config)
+    private void RunHeadless()
     {
-        HotKeyManager.RegisterSystemHotKey(IntPtr.Zero, HotKeyManager.HOTKEY_ID, config.Modifier, config.Key);
+        if (_config == null) return;
 
-        while (!Console.KeyAvailable)
+        InitializeSystemTray();
+
+        if (!HotKeyManager.RegisterSystemHotKey(IntPtr.Zero, _config.Modifier, _config.Key))
         {
-            if (GetMessage(out MSG msg, IntPtr.Zero, 0, 0) > 0)
-            {
-                if (msg.message == WM_HOTKEY)
-                {
-                    WindowsTerminalManager.ToggleWindowsTerminal();
-                }
-            }
+            Console.WriteLine($"Failed to register hotkey. Modifier: {_config.Modifier}, Key: {_config.Key}");
+            return;
         }
 
-        HotKeyManager.UnregisterSystemHotKey(IntPtr.Zero, HotKeyManager.HOTKEY_ID);
+        Console.WriteLine($"Hotkey registered. Modifier: {_config.Modifier}, Key: {_config.Key}. Running in headless mode.");
+
+        Application.Run();
+
+        HotKeyManager.UnregisterSystemHotKey(IntPtr.Zero);
+        _trayManager?.Dispose();
     }
 
-    private void RunWithUI(Config config)
+    private void RunWithUI()
     {
-        HotKeyManager.RegisterSystemHotKey(IntPtr.Zero, HotKeyManager.HOTKEY_ID, config.Modifier, config.Key);
+        if (_config == null) return;
 
-        Console.WriteLine("Hotkey registered. Press Alt+Space to toggle Windows Terminal.");
-        Console.WriteLine("Press any key to exit...");
+        InitializeSystemTray();
 
-        while (!Console.KeyAvailable)
+        if (!HotKeyManager.RegisterSystemHotKey(IntPtr.Zero, _config.Modifier, _config.Key))
         {
-            if (GetMessage(out MSG msg, IntPtr.Zero, 0, 0) > 0)
-            {
-                if (msg.message == WM_HOTKEY)
-                {
-                    WindowsTerminalManager.ToggleWindowsTerminal();
-                }
-            }
+            Console.WriteLine($"Failed to register hotkey. Modifier: {_config.Modifier}, Key: {_config.Key}");
+            return;
         }
 
-        HotKeyManager.UnregisterSystemHotKey(IntPtr.Zero, HotKeyManager.HOTKEY_ID);
+        Console.WriteLine($"Hotkey registered. Modifier: {_config.Modifier}, Key: {_config.Key}");
+        Console.WriteLine($"Press the configured hotkey to toggle Windows Terminal.");
+        Console.WriteLine("Right-click the system tray icon for options or press Ctrl+C to exit.");
+
+        Application.Run();
+
+        HotKeyManager.UnregisterSystemHotKey(IntPtr.Zero);
+        _trayManager?.Dispose();
     }
 
-    [DllImport("user32.dll")]
-    private static extern int GetMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MSG
+    private void InitializeSystemTray()
     {
-        public IntPtr hwnd;
-        public uint message;
-        public IntPtr wParam;
-        public IntPtr lParam;
-        public uint time;
-        public POINT pt;
+        if (_config == null) return;
+
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+
+        _trayManager = new SystemTrayManager(
+            onPositionSelected: position =>
+            {
+                _config.WindowPosition = position.ToString();
+                ConfigManager.Save(_config);
+                ToggleTerminal();
+            },
+            onSettingsRequested: () =>
+            {
+                // TODO: Implement settings dialog
+                MessageBox.Show("Settings dialog coming soon!", "Windows Terminal Hotkey");
+            }
+        );
+
+        _trayManager.Initialize();
+
+        // Register for Windows messages
+        Application.AddMessageFilter(new HotKeyMessageFilter(ToggleTerminal));
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct POINT
+    private void ToggleTerminal()
     {
-        public int X;
-        public int Y;
+        if (_config == null) return;
+
+        WindowsTerminalManager.ToggleWindowsTerminal(
+            _config.GetWindowPosition(),
+            _config.OverrideX,
+            _config.OverrideY,
+            _config.OverrideWidth,
+            _config.OverrideHeight
+        );
     }
 
-    private const int WM_HOTKEY = 0x0312;
+    private class HotKeyMessageFilter : IMessageFilter
+    {
+        private readonly Action _onHotKeyPressed;
+        private const int WM_HOTKEY = 0x0312;
+
+        public HotKeyMessageFilter(Action onHotKeyPressed)
+        {
+            _onHotKeyPressed = onHotKeyPressed;
+        }
+
+        public bool PreFilterMessage(ref Message m)
+        {
+            if (m.Msg == WM_HOTKEY)
+            {
+                _onHotKeyPressed();
+                return true;
+            }
+            return false;
+        }
+    }
 }

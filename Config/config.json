@@ -1,0 +1,13 @@
+{
+    "Modifier": 1,
+    "Key": 32,
+    "Profile": "Windows PowerShell",
+    "WindowPosition": "TopLeft", // Can be "FullScreen", "LeftHalf", "RightHalf", "TopHalf", "BottomHalf", "TopLeft", "TopRight", "BottomLeft", "BottomRight", "Centered"
+    "OverrideX": null, // Optional override for X coordinate
+    "OverrideY": null, // Optional override for Y coordinate
+    "OverrideWidth": null, // Optional override for window width
+    "OverrideHeight": null, // Optional override for window height
+    "RunAtStartup": false,
+    "SilentMode": false
+  }
+  
