@@ -29,7 +29,7 @@ A Windows application that brings iTerm2-like hotkey window functionality to Win
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/WindowsTerminalHotkey.git
+git clone https://github.com/willmortimer/WindowsTerminalHotkey.git
 ```
 
 2. Build the project:
